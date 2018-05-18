@@ -102,9 +102,10 @@ class BotClient(discord.Client):
         await server.ban(member, reason="{0.name} rejected user".format(user), delete_message_days=7)
 
 
-TOKEN = "NDQ2NDAwNzQwNzIyODY4MjMw.Dd4f8g.zMtqCG6oJUE7_6mSwWZXHghp0Sw"
 bot = BotClient()
 
-
 if __name__ == '__main__':
-    bot.run(TOKEN)
+    with open("token") as f:
+        token = f.readlines()[0].strip()
+
+    bot.run(token)
