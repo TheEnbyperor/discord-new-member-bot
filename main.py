@@ -5,7 +5,7 @@ import re
 import typing
 
 INTRO_MESSAGE = \
-    """Welcome to the #include<C++> discord server!
+    """Welcome to the {0.name} discord server!
 As part of an effort to combat bad players we require that you tell us a little about yourself.
 
 Please send me a quick message with your introduction."""
@@ -18,9 +18,9 @@ Their introduction is as follows:
 Please react to this message with a thumbs up / thumbs down to approve / ban the user."""
 
 APPROVED_CHAN_MESSAGE = """<@{0.id}> has been approved by <@{1.id}>"""
-APPROVED_DM_MESSAGE = """<@{0.id}> has approved you"""
+APPROVED_DM_MESSAGE = """<@{0.id}> has approved you into {1.name}"""
 REJECTED_CHAN_MESSAGE = """<@{0.id}> has been rejected by <@{1.id}>"""
-REJECTED_DM_MESSAGE = """<@{0.id}> has deemed that you should not be in #include<C++>"""
+REJECTED_DM_MESSAGE = """<@{0.id}> has deemed that you should not be in {1.name}"""
 
 AUTHED_ROLE = "authorised"
 APPROVALS_CHANNEL = "approvals"
@@ -34,7 +34,8 @@ class BotClient(discord.Client):
         print('------')
 
     async def on_member_join(self, member: discord.Member):
-        await member.send(content=INTRO_MESSAGE)
+        server = member.guild
+        await member.send(content=INTRO_MESSAGE.format(server))
 
     def get_member_and_server(self, user_id) -> typing.Tuple[typing.Union[discord.Member, None], typing.Union[discord.Guild, None]]:
         for s in self.guilds:
@@ -88,21 +89,21 @@ class BotClient(discord.Client):
             await self.reject_member(member, server, user)
 
     async def approve_member(self, member: discord.Member, server: discord.Guild, user: discord.Member):
-        role = discord.utils.get(server.roles, name=AUTHED_ROLE)
-        await member.add_roles(role, reason="{0.name} approved user".format(user))
         chan = discord.utils.get(server.channels, name=APPROVALS_CHANNEL)
         await chan.send(content=APPROVED_CHAN_MESSAGE.format(member, user))
-        await member.send(content=APPROVED_DM_MESSAGE.format(user))
+        await member.send(content=APPROVED_DM_MESSAGE.format(user, server))
+        role = discord.utils.get(server.roles, name=AUTHED_ROLE)
+        await member.add_roles(role, reason="{0.name} approved user".format(user))
 
     async def reject_member(self, member: discord.Member, server: discord.Guild, user: discord.Member):
         chan = discord.utils.get(server.channels, name=APPROVALS_CHANNEL)
         await chan.send(content=REJECTED_CHAN_MESSAGE.format(member, user))
-        await member.send(content=REJECTED_DM_MESSAGE.format(user))
+        await member.send(content=REJECTED_DM_MESSAGE.format(user, server))
         await server.ban(member, reason="{0.name} rejected user".format(user), delete_message_days=7)
 
 
 TOKEN = "NDQ2NDAwNzQwNzIyODY4MjMw.Dd4f8g.zMtqCG6oJUE7_6mSwWZXHghp0Sw"
-bot = BotClient(connector=aiohttp.TCPConnector(verify_ssl=False), proxy="http://localhost:8880")
+bot = BotClient()
 
 
 if __name__ == '__main__':
