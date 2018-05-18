@@ -1,4 +1,3 @@
-import aiohttp
 import discord
 import discord.raw_models
 import re
