@@ -8,11 +8,11 @@ class BotClient(discord.Client):
         print(self.user.id)
         print('------')
 
-        server = discord.utils.get(self.guilds, name="#include")
+        server = discord.utils.get(self.servers, name="#include")
         me = discord.utils.get(server.members, id=self.user.id)
         data = {}
         for channel in server.channels:
-            if not isinstance(channel, discord.TextChannel):
+            if not channel.type == discord.ChannelType.text:
                 continue
             if not me.permissions_in(channel).read_message_history:
                 continue
@@ -31,7 +31,7 @@ class BotClient(discord.Client):
 bot = BotClient()
 
 if __name__ == '__main__':
-    with open("q_token") as f:
+    with open("token") as f:
         token = f.readlines()[0].strip()
         print(token)
 
