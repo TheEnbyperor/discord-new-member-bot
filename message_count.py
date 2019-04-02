@@ -25,7 +25,6 @@ class BotClient(discord.Client):
         for user in data.keys():
             if isinstance(user, discord.Member):
                 print(user.top_role)
-
         await self.close()
 
 
@@ -35,5 +34,5 @@ if __name__ == '__main__':
     with open("q_token") as f:
         token = f.readlines()[0].strip()
         print(token)
-    bot.run(token, bot=False)
 
+    bot.run(token, bot=False)
